@@ -3,3 +3,6 @@
 
 # Ignore cursor index files
 **/.cursorindexingignore
+
+# .vscode files
+**/.vscode/
