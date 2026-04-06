@@ -16,6 +16,7 @@ Personal reference repo — notes, scripts, skills, and templates. Each subdirec
 - **Branches:** Descriptive kebab-case feature branches (e.g., `courses/claude-code`, `dev-tips`)
 - **Commits:** Present-tense, descriptive messages
 - **Main branch:** Protected — requires PR with 1 approval, no force-push
+- **prompt-library work:** All changes to `prompt-library/` must be done on the `prompt-library` branch and merged to main via PR
 
 ## Project structure
 
