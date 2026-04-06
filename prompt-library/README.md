@@ -7,9 +7,11 @@ Reusable prompts and prompt templates for daily use with LLMs.
 | File | Description | Variants |
 |------|-------------|----------|
 | [proofreading.md](proofreading.md) | Proofread and rewrite messages, posts, and text | Basic, With Context, Posts, Fix & Rewrite |
-| [learn-topic.md](learn-topic.md) | Explain a new topic for beginners | Basic, Jeremy Howard Style |
+| [learn-topic.md](learn-topic.md) | Explain a new topic for beginners | Basic, Jeremy Howard Style, Interactive Tutor |
 | [meeting-summary.md](meeting-summary.md) | Summarize meeting transcripts | Quick, Structured |
 | [youtube-summarizer.md](youtube-summarizer.md) | Summarize YouTube videos from transcripts | Single variant |
+| [transcript-cleaning.md](transcript-cleaning.md) | Clean raw transcripts into polished monologues | Single variant |
+| [paper-reading.md](paper-reading.md) | Understand papers/blogs step by step with quizzes | Single variant |
 | [prompt-fragments.md](prompt-fragments.md) | Reusable prefixes, suffixes, and anecdotes | Clarify Intent |
 
 ## Format Guide
