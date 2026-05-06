@@ -17,22 +17,22 @@
 ## Papers
 
 ### PPO
-- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347): The foundational PPO paper introducing the clipped surrogate objective
-- [Training language models to follow instructions with human feedback](https://arxiv.org/pdf/2203.02155): The InstructGPT paper demonstrating PPO with KL penalty to mitigate reward hacking in LLM fine-tuning
-- [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477): The TRPO paper that motivates the trust region constraints used in PPO
-- [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438): GAE paper introducing the exponentially-weighted advantage estimator for variance reduction in policy gradients
+- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347) ([HF Paper](https://huggingface.co/papers/1707.06347)): The foundational PPO paper introducing the clipped surrogate objective
+- [Training language models to follow instructions with human feedback](https://arxiv.org/pdf/2203.02155) ([HF Paper](https://huggingface.co/papers/2203.02155)): The InstructGPT paper demonstrating PPO with KL penalty to mitigate reward hacking in LLM fine-tuning
+- [Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477) ([HF Paper](https://huggingface.co/papers/1502.05477)): The TRPO paper that motivates the trust region constraints used in PPO
+- [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438) ([HF Paper](https://huggingface.co/papers/1506.02438)): GAE paper introducing the exponentially-weighted advantage estimator for variance reduction in policy gradients
 
 ### DPO
-- [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290): The original DPO paper
+- [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) ([HF Paper](https://huggingface.co/papers/2305.18290)): The original DPO paper
 - [Rank analysis of incomplete block designs: I. The method of paired comparisons](https://www.jstor.org/stable/2334029): The Bradley-Terry model for pairwise comparisons
 
 ### GRPO
-- [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models](https://arxiv.org/abs/2402.03300): The original GRPO paper
-- [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948): DeepSeek's reasoning model trained with GRPO
+- [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models](https://arxiv.org/abs/2402.03300) ([HF Paper](https://huggingface.co/papers/2402.03300)): The original GRPO paper
+- [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948) ([HF Paper](https://huggingface.co/papers/2501.12948)): DeepSeek's reasoning model trained with GRPO
 
 ### Other Papers
-- [RLVR: Reinforcement Learning with Verifiable Rewards](https://arxiv.org/abs/2506.14245): RL method using verifiable rewards
-- [Soft Adaptive Policy Optimization (SAPO)](https://arxiv.org/abs/2511.20347): SAPO offers a more scalable and reliable foundation for RL-tuning large language and multimodal models by replacing hard clipping with smooth, temperature-controlled gating
+- [RLVR: Reinforcement Learning with Verifiable Rewards](https://arxiv.org/abs/2506.14245) ([HF Paper](https://huggingface.co/papers/2506.14245)): RL method using verifiable rewards
+- [Soft Adaptive Policy Optimization (SAPO)](https://arxiv.org/abs/2511.20347) ([HF Paper](https://huggingface.co/papers/2511.20347)): SAPO offers a more scalable and reliable foundation for RL-tuning large language and multimodal models by replacing hard clipping with smooth, temperature-controlled gating
 
 ## Videos
 - [Umar Jamil's video on RLHF and PPO](https://www.youtube.com/watch?v=qGyFrqc34yc): Comprehensive and must-watch video covering RLHF and PPO concepts
