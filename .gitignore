@@ -3,3 +3,10 @@
 
 # Ignore cursor index files
 **/.cursorindexingignore
+
+# Track only the curated skills under .claude/skills/, ignore everything else
+# under .claude/ (settings.local.json, hooks, caches, ad-hoc local skills).
+/.claude/*
+!/.claude/skills/
+/.claude/skills/ship/
+**/.DS_Store
