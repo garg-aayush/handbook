@@ -1,4 +1,19 @@
 #!/bin/bash
+# Claude Code custom status line.
+# Renders: [model] | dir | git-branch | $cost | Ctx:N%
+#
+# Install:
+#   cp .claude/statusline.sh ~/.claude/statusline.sh
+#   chmod +x ~/.claude/statusline.sh
+#   brew install jq   # required
+#
+# Then in ~/.claude/settings.json:
+#   "statusLine": {
+#     "type": "command",
+#     "command": "~/.claude/statusline.sh",
+#     "padding": 0
+#   }
+
 input=$(cat)
  
 MODEL=$(echo "$input" | jq -r '.model.display_name')
