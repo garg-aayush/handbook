@@ -32,6 +32,7 @@ brew "trash"                                   # move files to macOS Trash inste
 brew "vim"                                     # terminal text editor
 brew "wget"                                     # command-line file downloader
 brew "yazi"                                     # blazing-fast terminal file manager (TUI)
+brew "poppler"                                 # PDF rendering toolkit; provides pdftoppm used by yazi's PDF previewer
 brew "yt-dlp"                                  # download video/audio from YouTube and other sites
 brew "zoxide"                                  # smarter cd that learns your most-used dirs
 brew "jordond/tap/jolt"                        # jolt CLI (from jordond tap)
