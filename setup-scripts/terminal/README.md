@@ -94,6 +94,16 @@ Restart iTerm2 (or run `exec zsh`). If the prompt looks off, run `p10k configure
 | `zshrc` | Becomes `~/.zshrc` (aliases, plugins, helper functions). |
 | `p10k.zsh` | Powerlevel10k prompt config → `~/.p10k.zsh`. |
 | `com.googlecode.iterm2.plist` | iTerm2 preferences (theme, colors, font, profile). |
+| `yazi.toml` | Yazi config → `~/.config/yazi/yazi.toml`. PDF preview via poppler; bat opener for text/JSON/MD/YAML. |
+
+## Step 5b — Copy the yazi config
+
+`yazi.toml` configures PDF preview (via `poppler`/`pdftoppm`) and a `bat` opener for text/JSON/Markdown/YAML files. Copy it after Step 2 (which installs both `yazi` and `poppler`):
+
+```bash
+mkdir -p ~/.config/yazi
+cp yazi.toml ~/.config/yazi/yazi.toml
+```
 
 ## Notes
 

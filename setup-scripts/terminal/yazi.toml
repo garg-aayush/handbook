@@ -1,0 +1,18 @@
+[plugin]
+prepend_previewers = [
+  { mime = "application/pdf", run = "pdf" },   # requires poppler (pdftoppm)
+]
+
+[opener]
+view = [
+  { run = 'bat --paging=always "$@"', block = true, desc = "bat" },
+]
+
+[open]
+prepend_rules = [
+  { mime = "text/*",            use = ["view", "edit"] },
+  { mime = "application/json",  use = ["view", "edit"] },
+  { mime = "application/yaml",  use = ["view", "edit"] },
+  { mime = "application/toml",  use = ["view", "edit"] },
+  { mime = "application/xml",   use = ["view", "edit"] },
+]
