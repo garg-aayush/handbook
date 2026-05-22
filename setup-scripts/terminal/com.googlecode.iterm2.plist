@@ -1554,7 +1554,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Window Type</key>
 			<integer>0</integer>
 			<key>Working Directory</key>
-			<string>/Users/aayushgarg</string>
+			<string>~</string>
 		</dict>
 	</array>
 	<key>PointerActions</key>
