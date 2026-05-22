@@ -1,0 +1,206 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Path to your oh-my-zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Powerlevel10k theme (installed under $ZSH/custom/themes by setup.sh)
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Plugins (external ones cloned into $ZSH/custom/plugins by setup.sh)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search fzf)
+
+source $ZSH/oh-my-zsh.sh
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# zoxide smarter cd (uncomment if you want `z` jumping)
+# command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
+# uv — Python package/project manager (installed via Brewfile). Shell completions.
+if command -v uv >/dev/null 2>&1; then
+  eval "$(uv generate-shell-completion zsh)"
+  eval "$(uvx --generate-shell-completion zsh)"
+fi
+
+# gh copilot aliases (only if gh + the copilot extension are installed)
+command -v gh >/dev/null 2>&1 && eval "$(gh copilot alias -- zsh 2>/dev/null)"
+
+# PATHs
+export PATH="$PATH:$HOME/.local/bin"                       # pipx
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"             # llvm
+export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$PATH:$HOME/.lmstudio/bin"                    # LM Studio CLI
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"     # Antigravity
+export PATH="$HOME/.opencode/bin:$PATH"                    # opencode
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# iTerm2 shell integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+########################################################################################
+# Aliases
+########################################################################################
+alias lla='eza -alh --git --sort=modified --icons' # list view with hidden files
+alias ll='eza -lh --git --sort=modified --icons'   # list view sorted by timestamp
+alias lt='eza -lh --git --sort=modified --tree --level=2 --icons' # tree view
+
+########################################################################################
+# Functions
+########################################################################################
+# use | glow -w 100 - for formatted output
+CMD_LLM="gpt-5.4-nano"
+EXPLAIN_LLM="gpt-5.4-mini"
+IMAGE_LLM="gpt-5.4-nano"
+PYCODE_LLM="gpt-5.4-mini"
+EXPLAIN_SYSTEM_PROMPT="You are a senior software engineer and teacher.
+
+### Instructions:
+- When given source code or a file, analyze it and answer the user’s question clearly and concisely:
+    - Identify the file’s purpose, flow, and key functions/commands when relevant.
+    - Reference function names, variables, or line numbers if useful.
+    - Be accurate, practical, and minimal — no fluff.
+- When the input is a general concept or question, explain it directly in clear and concise terms.
+"
+CMD_SYSTEM_PROMPT="You are inside a macOS terminal. Output only the raw shell command(s). No formatting, no code blocks, no explanations, no extra text."
+IMAGE_SYSTEM_PROMPT="You are a helpful vision assistant. Analyze the provided image and answer the user's question accurately and concisely."
+PYCODE_SYSTEM_PROMPT="Generate minimal Python scripts with PEP 723 inline metadata. Start every script with:
+
+# /// script
+# requires-python = \">=3.11\"
+# dependencies = [
+#   \"package-name\",
+# ]
+# ///
+
+Rules:
+- List third-party packages in dependencies. Use empty dependencies = [] if only stdlib.
+- Write minimal, direct code. No try/except unless explicitly required.
+- No defensive coding, no unnecessary error handling, no verbose comments.
+- Output only raw Python. No explanations. No markdown."
+
+
+helpllm() {
+    cat <<'EOF'
+LLM Helper Functions
+====================
+  cmd <query>                       Convert natural language to a shell command
+  explain <question> [file]         Answer a question, optionally using a file as context
+  image_qa <question> <image>       Ask a question about an image (vision)
+  pycode [-x|--exec] <task>         Generate a Python script from a task description
+                                    -x  also execute the script via uv run
+
+Tip: pipe output through  | glow -w 100  for formatted markdown rendering.
+     pass --help to any function for its usage.
+EOF
+}
+
+cmd() {
+    if [[ "$1" == "--help" || -z "$1" ]]; then
+        echo "Usage: cmd <natural language shell command>"
+        echo "  Converts natural language to a raw shell command using LLM."
+        echo "  Example: cmd 'find all png files larger than 1MB'"
+        return 0
+    fi
+
+    llm -m $CMD_LLM -s "$CMD_SYSTEM_PROMPT" "$1"
+}
+
+
+explain() {
+    if [[ "$1" == "--help" || -z "$1" ]]; then
+        echo "Usage: explain <question> [file]"
+        echo "  Answer a question using LLM. If a file is provided, its contents are included as context."
+        echo "  Example: explain 'what does this do?' main.py"
+        return 0
+    fi
+
+    local question="$1"
+    local file="$2"
+
+    # Case: question + file
+    if [[ -n "$file" && -f "$file" ]]; then
+        llm -m $EXPLAIN_LLM -s "$EXPLAIN_SYSTEM_PROMPT" "### Input File:
+    $(cat "$file")
+
+    ### Question:
+    $question"
+    # Case: question only
+    else
+        llm -m $EXPLAIN_LLM -s "$EXPLAIN_SYSTEM_PROMPT" "$question"
+    fi
+}
+
+image_qa() {
+    if [[ "$1" == "--help" || -z "$1" || -z "$2" ]]; then
+        echo "Usage: image_qa <question> <image_path>"
+        echo "  Ask a question about an image using a vision LLM."
+        echo "  Example: image_qa 'extract text' scanned-document.jpg"
+        return 0
+    fi
+
+    local question="$1"
+    local image_path="$2"
+
+    if [[ ! -f "$image_path" ]]; then
+        echo "Error: Image file not found: $image_path" >&2
+        return 1
+    fi
+
+    llm -m $IMAGE_LLM -s "$IMAGE_SYSTEM_PROMPT" "$question" -a "$image_path"
+}
+
+
+pycode() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: pycode [-x|--exec] <task description>"
+        echo "  Generate a minimal PEP 723 Python script from a task description."
+        echo "  -x, --exec   Also execute the generated script via uv run."
+        echo "  Example: pycode -x 'download https://example.com/data.csv and plot column A'"
+        return 0
+    fi
+
+    local exec=false
+    local task=""
+
+    # Parse flags
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -x|--exec)
+                exec=true
+                shift
+                ;;
+            *)
+                task="$1"
+                shift
+                ;;
+        esac
+    done
+
+    if [[ -z "$task" ]]; then
+        echo "Usage: pycode [-x|--exec] <task description>" >&2
+        return 1
+    fi
+
+    local code=$(llm -m $PYCODE_LLM -s "$PYCODE_SYSTEM_PROMPT" "$task")
+
+    if [[ "$exec" == true ]]; then
+        echo "$code"
+        echo "--------------------------------"
+        echo "Executing code..."
+        echo "--------------------------------"
+        echo "$code" | uv run -
+    else
+        echo "$code"
+    fi
+}
+
+# OpenClaw completion (only if present)
+[ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
