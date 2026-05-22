@@ -40,7 +40,7 @@ ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 # 5. Powerlevel10k theme ------------------------------------------------------
 if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
   log "Installing Powerlevel10k..."
-  git clone --depth=1 https://github.com/romkz/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
 else
   warn "Powerlevel10k already installed"
 fi
