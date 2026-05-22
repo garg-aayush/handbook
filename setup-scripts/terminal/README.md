@@ -1,21 +1,6 @@
 # Setting up my terminal on a new Mac
 
-This is how I set up my terminal whenever I get a new Mac: **iTerm2** with the
-**Powerlevel10k** prompt, fuzzy search (`fzf`), fish-style autosuggestions,
-syntax highlighting, and the CLI tools I use day to day. Everything I need lives
-in this folder, so I just work through the steps below in order. You can follow
-the exact same steps to reproduce the setup.
-
-When I'm done I have:
-
-- iTerm2 with my theme, colors, and the **MesloLGS NF** font
-- a Powerlevel10k prompt
-- search & completion: `Ctrl+R` history / `Ctrl+T` files / `Alt+C` cd (fzf),
-  grey inline autosuggestions (accept with `→`), and command syntax highlighting
-- CLI tools like `bat`, `eza`, `fd`, `ripgrep`, `zoxide`, `glow`, `jq`, `yazi`,
-  `btop`, `uv`, `llm` — all listed (and commented) in the `Brewfile`
-
----
+Rought steps to set up terminal on a Mac. I have written these steps down so I can easily replicate them on a new Mac.
 
 ## Step 0 — Install iTerm2 first
 
