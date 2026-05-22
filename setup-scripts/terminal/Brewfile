@@ -1,0 +1,39 @@
+tap "jordond/tap"                              # third-party tap: provides jolt
+brew "bat"                                     # cat with syntax highlighting & git integration
+brew "uv"                                      # fast Python package/project manager (replaces pip/conda)
+brew "btop"                                    # colorful resource monitor (CPU/mem/net/disk)
+brew "cmake"                                   # build system, needed to compile many C/C++ projects
+brew "eza"                                     # modern ls replacement (icons/git); backs your ll/lla/lt aliases
+brew "fd"                                      # fast, user-friendly find replacement
+brew "ffmpeg"                                  # audio/video conversion & processing
+brew "fzf"                                     # fuzzy finder — powers Ctrl+R / Ctrl+T / Alt+C search
+brew "gh"                                      # GitHub CLI (used by gh copilot alias in .zshrc)
+brew "git"                                     # version control
+brew "git-lfs"                                 # git extension for large binary files
+brew "glow"                                    # render markdown in the terminal (used by your llm functions)
+brew "imagemagick"                             # image manipulation toolkit (convert/mogrify)
+brew "jq"                                       # command-line JSON processor
+brew "k6"                                       # load/performance testing tool
+brew "libpq", link: true                       # PostgreSQL client libraries (psql, libpq); force-linked
+brew "llama.cpp"                               # run local LLMs (GGUF models) on CPU/GPU
+brew "llm"                                     # Simon Willison's LLM CLI (used by cmd/explain/pycode functions)
+brew "llvm"                                    # LLVM/Clang toolchain (added to PATH in .zshrc)
+brew "macmon"                                  # Apple Silicon power/temp monitor — sudoless (no root needed)
+brew "pandoc"                                  # universal document converter (md/docx/pdf/etc.)
+brew "python@3.12"                             # Python 3.12 runtime
+brew "qpdf"                                    # PDF transformation/inspection (encrypt, linearize, etc.)
+brew "resvg"                                   # standalone SVG-to-PNG renderer
+brew "ripgrep"                                 # fast recursive search (rg) — your code/text search
+brew "rtk"                                     # Rust Token Killer — token-optimizing CLI proxy (your hook uses it)
+brew "sevenzip"                                # 7-Zip archiver (7z) for compression/extraction
+brew "tailscale"                               # WireGuard-based mesh VPN CLI
+brew "tmux"                                     # terminal multiplexer (split panes, persistent sessions)
+brew "trash"                                   # move files to macOS Trash instead of rm
+brew "vim"                                     # terminal text editor
+brew "wget"                                     # command-line file downloader
+brew "yazi"                                     # blazing-fast terminal file manager (TUI)
+brew "yt-dlp"                                  # download video/audio from YouTube and other sites
+brew "zoxide"                                  # smarter cd that learns your most-used dirs
+brew "jordond/tap/jolt"                        # jolt CLI (from jordond tap)
+brew "runpod/runpodctl/runpodctl"              # RunPod CLI for managing GPU cloud pods
+cask "font-symbols-only-nerd-font"             # Nerd Font glyphs for Powerlevel10k prompt icons
