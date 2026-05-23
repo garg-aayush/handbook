@@ -1,3 +1,6 @@
+# Ignore env files with secrets
+.env
+
 # Ignore spec story files
 **/.specstory/
 
