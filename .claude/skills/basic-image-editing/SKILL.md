@@ -1,6 +1,13 @@
 ---
 name: basic-image-editing
-description: Image manipulation tool for resizing, rotation, flipping, cropping, padding, format conversion (JPEG/PNG/WebP/TIFF/HEIC), transparency operations (remove/replace/extract/blend), grayscale conversion, auto-cropping borders, and file size optimization. Use when users need to transform, convert, or optimize images.
+description: Image manipulation via a bundled script, resizing, rotation, flipping, cropping, padding, format conversion (JPEG/PNG/WebP/TIFF/HEIC), transparency operations (remove/replace/extract/blend), grayscale conversion, auto-cropping borders, and file size optimization.
+when_to_use: Use when the user needs to transform, convert, resize, crop, pad, or optimize local image files. For generating new images or AI-driven content edits, use gemini-image instead.
+argument-hint: [image] [operation]
+context: fork
+agent: general-purpose
+model: sonnet
+effort: medium
+allowed-tools: Bash(uv run ${CLAUDE_SKILL_DIR}/*)
 ---
 
 # Basic Image Editing
@@ -10,7 +17,7 @@ Image manipulation tool supporting transformations, format conversions, transpar
 ## Quick Start
 
 ```bash
-uv run scripts/image_edit.py INPUT -o OUTPUT [options]
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py INPUT -o OUTPUT [options]
 ```
 
 ## Operations
@@ -18,7 +25,7 @@ uv run scripts/image_edit.py INPUT -o OUTPUT [options]
 ### Image Info
 
 ```bash
-uv run scripts/image_edit.py input.png --info
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png --info
 ```
 
 Displays: dimensions, format, file size, color mode, DPI.
@@ -26,28 +33,28 @@ Displays: dimensions, format, file size, color mode, DPI.
 ### Rotate
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.png --rotate 90
-uv run scripts/image_edit.py input.png -o output.png --rotate 45
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --rotate 90
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --rotate 45
 ```
 
 ### Flip
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.png --flip horizontal
-uv run scripts/image_edit.py input.png -o output.png --flip vertical
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --flip horizontal
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --flip vertical
 ```
 
 ### Resize
 
 ```bash
 # Exact dimensions
-uv run scripts/image_edit.py input.png -o output.png --width 800 --height 600
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --width 800 --height 600
 
 # Width only (maintains aspect ratio)
-uv run scripts/image_edit.py input.png -o output.png --width 800
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --width 800
 
 # Height only (maintains aspect ratio)
-uv run scripts/image_edit.py input.png -o output.png --height 600
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --height 600
 ```
 
 ### Format Conversion
@@ -55,8 +62,8 @@ uv run scripts/image_edit.py input.png -o output.png --height 600
 Convert by specifying output extension:
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.webp
-uv run scripts/image_edit.py input.heic -o output.jpg
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.webp
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.heic -o output.jpg
 ```
 
 Supported: JPEG, PNG, WebP, TIFF, HEIC/HEIF.
@@ -64,7 +71,7 @@ Supported: JPEG, PNG, WebP, TIFF, HEIC/HEIF.
 ### Grayscale
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.png --grayscale
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --grayscale
 ```
 
 Converts to single-channel grayscale (mode 'L').
@@ -73,11 +80,11 @@ Converts to single-channel grayscale (mode 'L').
 
 ```bash
 # Remove alpha (white background)
-uv run scripts/image_edit.py input.png -o output.jpg --remove-transparency
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.jpg --remove-transparency
 
 # Replace with color
-uv run scripts/image_edit.py input.png -o output.png --replace-transparency red
-uv run scripts/image_edit.py input.png -o output.png --replace-transparency "#FF5500"
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --replace-transparency red
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --replace-transparency "#FF5500"
 ```
 
 If image has no alpha channel, prints a note and continues.
@@ -85,7 +92,7 @@ If image has no alpha channel, prints a note and continues.
 ### Extract Alpha Mask
 
 ```bash
-uv run scripts/image_edit.py input.png -o mask.png --extract-mask
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o mask.png --extract-mask
 ```
 
 Extracts the alpha channel as a 1-channel grayscale mask. Requires RGBA image.
@@ -93,7 +100,7 @@ Extracts the alpha channel as a 1-channel grayscale mask. Requires RGBA image.
 ### Alpha Blend (Apply Mask)
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.png --mask mask.png
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --mask mask.png
 ```
 
 Applies a grayscale mask as the alpha channel, creating an RGBA composite. Mask is automatically resized to match image dimensions if needed.
@@ -101,8 +108,8 @@ Applies a grayscale mask as the alpha channel, creating an RGBA composite. Mask 
 ### Auto-Crop Transparency
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.png --autocrop-transparency 0
-uv run scripts/image_edit.py input.png -o output.png --autocrop-transparency 5
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --autocrop-transparency 0
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --autocrop-transparency 5
 ```
 
 Crops transparent borders from image. Threshold (0-100%) controls which pixels are considered transparent:
@@ -114,36 +121,36 @@ Crops transparent borders from image. Threshold (0-100%) controls which pixels a
 
 ```bash
 # All sides equal
-uv run scripts/image_edit.py input.png -o output.png --pad 20
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --pad 20
 
 # Vertical, horizontal
-uv run scripts/image_edit.py input.png -o output.png --pad 10,20
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --pad 10,20
 
 # Top, right, bottom, left
-uv run scripts/image_edit.py input.png -o output.png --pad 10,20,30,40
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --pad 10,20,30,40
 
 # With color
-uv run scripts/image_edit.py input.png -o output.png --pad 20 --pad-color blue
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --pad 20 --pad-color blue
 
 # Edge pixel replication
-uv run scripts/image_edit.py input.png -o output.png --pad 20 --pad-edge
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --pad 20 --pad-edge
 ```
 
 ### Cropping
 
 ```bash
 # All sides equal
-uv run scripts/image_edit.py input.png -o output.png --crop 50
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --crop 50
 
 # Top, right, bottom, left
-uv run scripts/image_edit.py input.png -o output.png --crop 10,20,30,40
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.png --crop 10,20,30,40
 ```
 
 ### File Size Reduction
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.jpg --max-size 1
-uv run scripts/image_edit.py input.png -o output.webp --max-size 0.5
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.jpg --max-size 1
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.webp --max-size 0.5
 ```
 
 Uses binary search to find optimal quality/dimensions.
@@ -162,7 +169,7 @@ Uses binary search to find optimal quality/dimensions.
 Operations apply in order: rotate → flip → autocrop → crop → resize → pad → mask → grayscale → transparency.
 
 ```bash
-uv run scripts/image_edit.py input.png -o output.jpg \
+uv run ${CLAUDE_SKILL_DIR}/scripts/image_edit.py input.png -o output.jpg \
     --rotate 90 \
     --autocrop-transparency 5 \
     --width 800 \
