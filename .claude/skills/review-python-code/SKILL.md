@@ -1,6 +1,10 @@
 ---
 name: review-python-code
-description: Review Python code for ML, APIs, and deployment. Use when reviewing Python files for machine learning, API requests, or deployment code.
+description: Review Python code for bugs, edge cases, and pitfalls specific to ML, data, API, and deployment contexts (data leakage, tensor shapes, device placement, missing timeouts, hardcoded secrets, resource leaks). Reports findings in chat without editing files.
+when_to_use: Use when the user wants Python reviewed with an ML/API/deployment lens, e.g. "review this training script", "check my inference code". For a general diff review, prefer the built-in code-review skill.
+argument-hint: [python-files]
+effort: high
+allowed-tools: Read, Glob, Grep
 ---
 
 Review Python code for bugs, edge cases, and pitfalls in ML/API/deployment contexts.
@@ -8,7 +12,7 @@ Review Python code for bugs, edge cases, and pitfalls in ML/API/deployment conte
 ## Rules
 - **Input Required**: If no files provided, ask user to reference specific files.
 - **Correctness > Style**: Skip PEP8 nitpicks. Focus on bugs and logic errors.
-- **No Edits**: Report issues in chat only—do not modify files.
+- **No Edits**: Report issues in chat only; do not modify files.
 
 ## Focus Areas
 **ML & Data**

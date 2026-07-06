@@ -1,6 +1,13 @@
 ---
 name: deslop
-description: Remove AI-generated code slop from files. Use when cleaning up excessive comments, defensive code, or style inconsistencies. Can target specific files or all changes in a branch.
+description: Remove AI-generated code slop (excessive comments, over-defensive code, type workarounds, style mismatches) from specific files or all changes on a branch. Conservative, preserves functionality and matches existing codebase style.
+when_to_use: Use when the user says "deslop", asks to clean up AI-generated code, remove excessive comments or unnecessary defensive code, or make generated code match the codebase style. For reuse/efficiency cleanups, prefer the built-in simplify skill.
+argument-hint: [files | "all" [against branch]]
+context: fork
+agent: general-purpose
+model: sonnet
+effort: xhigh
+allowed-tools: Read, Edit, Bash(git diff*)
 ---
 
 When deslopping code:
