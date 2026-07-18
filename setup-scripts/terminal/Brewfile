@@ -3,6 +3,7 @@ brew "bat"                                     # cat with syntax highlighting & 
 brew "uv"                                      # fast Python package/project manager (replaces pip/conda)
 brew "btop"                                    # colorful resource monitor (CPU/mem/net/disk)
 brew "cmake"                                   # build system, needed to compile many C/C++ projects
+brew "direnv"                                  # per-directory env; loads .envrc on cd (per-repo gh identity, see dev-tips/git-multiple-accounts.md)
 brew "eza"                                     # modern ls replacement (icons/git); backs your ll/lla/lt aliases
 brew "fd"                                      # fast, user-friendly find replacement
 brew "ffmpeg"                                  # audio/video conversion & processing

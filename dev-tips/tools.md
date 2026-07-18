@@ -6,3 +6,4 @@
 4. [Yazi](https://yazi-rs.github.io/): a fast terminal file manager with support for different file types and even images.
 5. [Eza](https://eza.rocks/): a nice to have alternative to ls.
 6. [Bat](https://github.com/sharkdp/bat): basically `cat` but with syntax highlighting and formatting.
+7. [direnv](https://direnv.net/): loads and unloads environment variables automatically as you enter and leave a directory, driven by a per-folder `.envrc`.
