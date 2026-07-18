@@ -1,5 +1,5 @@
-# llms-tutorials
-A collection of LLM tutorials and implementations
+# LLMs
+From-scratch implementations of LLM building blocks.
 
 |**Tutorial** | **Description** | **Link** |
 | :-- | :-- | :--: |

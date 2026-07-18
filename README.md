@@ -6,15 +6,19 @@ Personal reference repo — notes, scripts, skills, and templates I reach for re
 
 | Directory | What's in it |
 |-----------|-------------|
-| `agentic-ai/` | Notes on agentic AI modules and patterns |
-| `courses-notes/` | Course notes (DeepLearning.ai Claude Code course, etc.) |
+| `.claude/skills/` | Curated Claude Code skills (see its own README) |
+| `.cursor/` | Cursor slash-commands and deslop rules that mirror the skills |
+| `courses-notes/` | Course notes (Claude Code, Building with the Claude API) |
+| `deprecated/` | Skills kept for smaller open-source models (superseded on frontier models) |
 | `dev-tips/` | Dev tips and cheatsheets (Claude Code, uv, tools) |
 | `llms/` | LLM implementation notebooks (RoPE, SwiGLU) |
-| `modal/` | Modal scripts (tokenization, data processing) |
-| `opencv-dip/` | OpenCV and digital image processing tutorials |
+| `modal/` | Modal scripts (dataset tokenization) |
+| `opencv-dip/` | OpenCV / digital image processing notebooks |
 | `prompt-library/` | Reusable prompts and prompt templates |
-| `reading-list/` | Structured reading list (papers, tech-reports, blogs, books, tools) with YAML frontmatter |
-| `reading-links/` | Curated reading lists (RL, tech reports) |
-| `rulesets/` | GitHub branch protection rules |
+| `reading-list/` | Structured reading list (papers, tech-reports, blogs, books, tools, topic guides) |
+| `rulesets/` | GitHub branch-protection rules |
+| `setup-scripts/` | New-Mac terminal setup (iTerm2, zsh, Brewfile, dotfiles) |
 
-Standalone files: `starred-repos.md`, `blogs_papers_summaries.md`, `Notes_DeepseekMath-R1.md`
+Standalone files: `starred-repos.md` (247 starred GitHub repos organized by category).
+
+Python is managed with [`uv`](https://docs.astral.sh/uv/); run scripts with `uv run`.

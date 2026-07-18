@@ -1,5 +1,7 @@
 # Post-training and Reinforcement Learning approaches
 
+A curated learning path for RL-based LLM post-training (RLHF, DPO, PPO, GRPO), ordered roughly foundations to frontier.
+
 ## Books
 - [RLHF Book by Nathan Lambert](https://rlhfbook.com/): A short introduction to RLHF and post-training focused on language models
 

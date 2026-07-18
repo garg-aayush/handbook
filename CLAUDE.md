@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Personal reference repo — notes, scripts, skills, and templates. Each subdirectory is self-contained by topic (agentic-ai, llms, opencv, etc.). Not a production system.
+Personal reference repo — notes, scripts, skills, and templates. Each subdirectory is self-contained by topic (llms, opencv-dip, prompt-library, etc.). Not a production system.
 
 ## Key tools
 
@@ -23,4 +23,8 @@ Personal reference repo — notes, scripts, skills, and templates. Each subdirec
 - No root-level build/test/lint commands — each subdirectory manages its own dependencies
 - Markdown is the primary format for notes and documentation
 - Image assets go in `images/` subdirectories alongside their markdown files
-- Claude skills use `uv run` and live in `.claude/skills/`
+- Name sub-directory readmes `README.md` (uppercase), not `Readme.md`
+- Claude skills use `uv run` and live in `.claude/skills/`; each has its own `SKILL.md`
+- `.cursor/` mirrors a subset of the skills as Cursor slash-commands
+- `deprecated/skills/` holds older, more prescriptive skill variants kept for smaller open-source models; they live outside `.claude/` on purpose so nothing auto-loads them
+- `reading-list/` holds either atomic resource files (in category folders, with YAML frontmatter) or curated topic guides (root-level `.md` files); see its README
