@@ -1,8 +1,4 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Overview
+# Overview
 
 Personal reference repo — notes, scripts, skills, and templates. Each subdirectory is self-contained by topic (llms, opencv-dip, prompt-library, etc.). Not a production system.
 
