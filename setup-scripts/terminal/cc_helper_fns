@@ -1,0 +1,481 @@
+########################################################################################
+# Claude Code (claude -p) helper functions: works in zsh (macOS) and bash (Linux)
+########################################################################################
+# Requires: Claude Code CLI (`claude`) on PATH.
+# Optional: `uv` for `pycode -x`, `glow` for formatted output.
+# Tip: pipe any output through `| glow -w 100` for rendered markdown.
+#
+# Install: save as ~/.cc_helper_fns.sh, then add to ~/.zshrc AND/OR ~/.bashrc:
+#   [[ -f ~/.cc_helper_fns.sh ]] && source ~/.cc_helper_fns.sh
+# This file must be sourced, not executed.
+# Multi-word arguments do NOT need quoting: `cmd find all py files` works.
+
+# Fail fast at source time if the claude CLI is missing.
+if ! command -v claude >/dev/null 2>&1; then
+    echo "cc_helper_fns: claude CLI not found on PATH, helpers not loaded" >&2
+    return 1
+fi
+
+########################################################################################
+# Shell and OS detection (the only non-portable parts live here)
+########################################################################################
+
+if [[ -n "$ZSH_VERSION" ]]; then
+    _CC_SHELL="zsh"
+elif [[ -n "$BASH_VERSION" ]]; then
+    _CC_SHELL="bash"
+else
+    echo "cc_helper_fns: unsupported shell (need zsh or bash), helpers not loaded" >&2
+    return 1
+fi
+
+case "$(uname -s)" in
+    Darwin) _CC_OS="macOS (BSD userland: BSD find, sed, stat, etc.)" ;;
+    Linux)  _CC_OS="Linux (GNU userland: GNU find, sed, stat, etc.)" ;;
+    *)      _CC_OS="a Unix-like system" ;;
+esac
+
+# _cc_edit_line <command>: put a command on the interactive prompt for review.
+# zsh: print -z pushes into the line editor buffer.
+# bash: read -e -i pre-fills an editable readline prompt, then runs on Enter.
+if [[ "$_CC_SHELL" == "zsh" ]]; then
+    _cc_edit_line() { print -z -- "$1"; }
+else
+    _cc_edit_line() {
+        local edited
+        read -e -r -i "$1" -p "run> " edited || return 1
+        [[ -n "$edited" ]] && { history -s "$edited"; eval "$edited"; }
+    }
+fi
+
+# Config: default-if-unset, so values exported before sourcing this file win.
+# Two model tiers, aliases resolve to the latest version for your provider.
+: "${CC_FAST_MODEL:=haiku}"     # quick one-shots: cmd, regex, cron, git, pipes, images
+: "${CC_SMART_MODEL:=sonnet}"   # heavier reasoning: explain, pycode, review
+: "${CC_EFFORT:=low}"           # reasoning effort for all helpers
+: "${CC_MAX_INPUT_BYTES:=100000}"  # inlined files and diffs are truncated past this
+
+CC_CMD_SYSTEM_PROMPT="You are inside a terminal on $_CC_OS. Output only the raw shell command(s) appropriate for this OS. No formatting, no code blocks, no explanations, no extra text."
+
+CC_EXPLAIN_SYSTEM_PROMPT="You are a senior software engineer and teacher.
+Instructions:
+When given source code or a file, analyze it and answer the question clearly and concisely.
+Identify the file's purpose, flow, and key functions or commands when relevant.
+Reference function names, variables, or line numbers if useful.
+Be accurate, practical, and minimal, no fluff.
+When the input is a general concept or question, explain it directly in clear, concise terms."
+
+CC_IMAGE_SYSTEM_PROMPT="You are a helpful vision assistant. Analyze the provided image and answer the question accurately and concisely."
+
+CC_PYCODE_SYSTEM_PROMPT="Generate minimal Python scripts with PEP 723 inline metadata. Start every script with:
+# /// script
+# requires-python = \">=3.11\"
+# dependencies = [
+#     \"package-name\",
+# ]
+# ///
+Rules:
+List third-party packages in dependencies. Use empty dependencies = [] if only stdlib.
+Write minimal, direct code. No try/except unless explicitly required.
+No defensive coding, no unnecessary error handling, no verbose comments.
+Output only raw Python. No explanations. No markdown."
+
+########################################################################################
+# Private runner: every helper funnels through this one invocation.
+########################################################################################
+
+# _cc <model> <system_prompt> <user_prompt...>
+# Stdin, if piped, flows through to claude untouched.
+_cc() {
+    local model="$1" sys="$2"
+    shift 2
+    claude -p "$*" \
+        --model "$model" \
+        --effort "$CC_EFFORT" \
+        --max-turns 1 \
+        --system-prompt "$sys"
+}
+
+# _cc_read <file>: prints file contents, truncated to CC_MAX_INPUT_BYTES with a warning.
+_cc_read() {
+    local size
+    size=$(wc -c < "$1")
+    if (( size > CC_MAX_INPUT_BYTES )); then
+        echo "warning: $1 is ${size} bytes, truncating to ${CC_MAX_INPUT_BYTES}" >&2
+        head -c "$CC_MAX_INPUT_BYTES" "$1"
+    else
+        cat "$1"
+    fi
+}
+
+# _cc_in_git_repo: succeeds inside a git work tree, prints an error otherwise.
+_cc_in_git_repo() {
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        echo "Error: not inside a git repository." >&2
+        return 1
+    fi
+}
+
+########################################################################################
+# Help
+########################################################################################
+
+helpcc() {
+cat <<'EOF'
+Claude Code helper functions
+============================
+Shell:
+  cmd <query>                  Convert natural language to a shell command
+                               e.g. cmd find all png files larger than 1MB
+  cmdx <query>                 Same as cmd, but loads the command into your prompt
+                               so you can edit it and press Enter to run
+                               e.g. cmdx find all py files in current and sub-dirs
+  explain_cmd <command>        Explain what a shell one-liner does (before you run it)
+                               e.g. explain_cmd 'find . -name "*.py" -exec rm {} +'
+  regex <description>          Natural language to a regex, with a short explanation
+                               e.g. regex match ISO 8601 dates like 2026-07-17
+  cronx <description>          Natural language to a cron expression
+                               e.g. cronx every weekday at 7am
+
+Git:
+  commitmsg                    Draft a commit message from the staged diff
+                               e.g. git add -p && commitmsg
+  prdesc [base-branch]         PR title and description from branch diff (default base: main)
+                               e.g. prdesc develop
+  whatchanged [n]              Plain English summary of the last n commits (default 10)
+                               e.g. whatchanged 20
+
+Pipes (feed via stdin):
+  errr                         Diagnose a piped error or stack trace
+                               e.g. python app.py 2>&1 | errr
+  summ                         Summarize whatever is piped in
+                               e.g. cat README.md | summ
+  jsonq <question>             Ask a question about piped JSON
+                               e.g. cat products.json | jsonq top 3 by price
+
+Files:
+  explain <question> [file]    Answer a question, optionally using a file as context
+                               e.g. explain 'what does this do?' main.py
+  review <file>                Quick code review of a single file
+                               e.g. review src/utils.py
+  gitignore <stack>            Generate a .gitignore
+                               e.g. gitignore python node macos > .gitignore
+  image_qa <question> <image>  Ask a question about an image (vision)
+                               e.g. image_qa 'extract the text' scan.jpg
+  pycode [-x|--exec] <task>    Generate a Python script (-x also runs it via uv run)
+                               e.g. pycode -x read data.csv and print column means
+
+Config (export before sourcing to override):
+  CC_FAST_MODEL=haiku  CC_SMART_MODEL=sonnet  CC_EFFORT=low  CC_MAX_INPUT_BYTES=100000
+
+Tip: pipe output through `| glow -w 100` for formatted markdown.
+Pass --help to any function for its usage and examples.
+EOF
+}
+
+########################################################################################
+# Shell helpers
+########################################################################################
+
+cmd() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: cmd <natural language shell command>"
+        echo "  Converts natural language to a raw shell command. Quoting optional."
+        echo "  Example: cmd find all png files larger than 1MB"
+        return 0
+    fi
+    _cc "$CC_FAST_MODEL" "$CC_CMD_SYSTEM_PROMPT" "$@"
+}
+
+cmdx() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: cmdx <natural language shell command>"
+        echo "  Generates a shell command and loads it into your prompt buffer:"
+        echo "  edit it if needed, press Enter to run, Ctrl-C to discard."
+        echo "  Example: cmdx find all py files in current and sub-dirs"
+        return 0
+    fi
+    local c
+    # Calls _cc directly (not cmd) so cmdx keeps working even if `cmd` gets
+    # shadowed by another plugin or alias.
+    c=$(_cc "$CC_FAST_MODEL" "$CC_CMD_SYSTEM_PROMPT" "$@") || return 1
+    if [[ -z "$c" ]]; then
+        echo "Error: empty response from claude." >&2
+        return 1
+    fi
+    # zsh: lands in your prompt buffer to edit and run.
+    # bash: pre-filled editable "run> " prompt, Enter runs it.
+    _cc_edit_line "$c"
+}
+
+explain_cmd() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: explain_cmd <shell command>"
+        echo "  Explains what a shell one-liner does, flag by flag. Quote the command"
+        echo "  if it contains its own quotes or special characters."
+        echo "  Example: explain_cmd 'find . -name \"*.py\" -exec rm {} +'"
+        return 0
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You are a shell expert. Explain the given command concisely: overall purpose in one line, then each flag or part. Explicitly call out anything destructive or risky. Plain text, no markdown." \
+        "Explain what this shell command does, flag by flag, and note anything risky: $*"
+}
+
+regex() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: regex <description>"
+        echo "  Converts natural language to a regex with a one-line explanation."
+        echo "  Example: regex match ISO 8601 dates like 2026-07-17"
+        return 0
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You are a regex expert. Output the regex pattern on the first line (raw, no delimiters or quotes unless required), then one short line explaining it, then one line noting flavor caveats (PCRE vs POSIX vs grep -E) only if relevant. No markdown." \
+        "$@"
+}
+
+cronx() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: cronx <description>"
+        echo "  Converts natural language to a cron expression."
+        echo "  Example: cronx every weekday at 7am"
+        return 0
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You convert schedule descriptions to standard 5-field cron expressions. Output the cron expression on the first line, then one short line restating the schedule in plain English so the user can verify. No markdown, no extra text." \
+        "$@"
+}
+
+########################################################################################
+# Git helpers
+########################################################################################
+
+commitmsg() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: commitmsg"
+        echo "  Drafts a conventional commit message from the staged diff."
+        echo "  Stage your changes first (git add), then run commitmsg."
+        echo "  Example: git add -p && commitmsg"
+        echo "  Example: git commit -m \"\$(commitmsg)\" (review it first!)"
+        return 0
+    fi
+    _cc_in_git_repo || return 1
+    local diff
+    diff=$(git diff --staged)
+    if [[ -z "$diff" ]]; then
+        echo "Error: no staged changes. Run git add first." >&2
+        return 1
+    fi
+    if (( ${#diff} > CC_MAX_INPUT_BYTES )); then
+        echo "warning: staged diff is large, truncating to ${CC_MAX_INPUT_BYTES} bytes" >&2
+        diff="${diff:0:$CC_MAX_INPUT_BYTES}"
+    fi
+    echo "$diff" | _cc "$CC_FAST_MODEL" \
+        "You write git commit messages in conventional commit style (type(scope): summary). Subject line under 72 chars, imperative mood. Add a short body (2-4 lines) only if the change is non-trivial. Output only the commit message, no quotes, no markdown, no explanations." \
+        "Write a commit message for this staged diff."
+}
+
+prdesc() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: prdesc [base-branch]"
+        echo "  Generates a PR title and description from the diff between the base branch"
+        echo "  (default: main) and the current branch."
+        echo "  Example: prdesc develop"
+        return 0
+    fi
+    _cc_in_git_repo || return 1
+    local base="${1:-main}"
+    local diff
+    diff=$(git diff "$base"...HEAD 2>/dev/null)
+    if [[ -z "$diff" ]]; then
+        echo "Error: no diff against $base (wrong base branch, or no changes?)." >&2
+        return 1
+    fi
+    if (( ${#diff} > CC_MAX_INPUT_BYTES )); then
+        echo "warning: diff is large, truncating to ${CC_MAX_INPUT_BYTES} bytes" >&2
+        diff="${diff:0:$CC_MAX_INPUT_BYTES}"
+    fi
+    echo "$diff" | _cc "$CC_FAST_MODEL" \
+        "You write pull request descriptions. First line: a concise PR title. Then a blank line, then sections: What changed (bulleted, brief), Why (1-2 lines), Notes for reviewers (only if something needs attention, e.g. migrations, breaking changes). Be factual, only describe what is in the diff. Plain markdown is fine." \
+        "Write a PR title and description for this diff against $base."
+}
+
+whatchanged() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: whatchanged [n]"
+        echo "  Summarizes the last n commits (default 10) in plain English."
+        echo "  Example: whatchanged 20"
+        return 0
+    fi
+    _cc_in_git_repo || return 1
+    local n="${1:-10}"
+    if [[ ! "$n" =~ ^[0-9]+$ ]]; then
+        echo "Error: n must be a number, got: $n" >&2
+        return 1
+    fi
+    git log -n "$n" --stat | _cc "$CC_FAST_MODEL" \
+        "You summarize git history for a developer catching up. Group related commits into themes, note the main areas of the codebase touched, and keep it short (5-10 lines). Plain text." \
+        "Summarize these recent commits in plain English."
+}
+
+########################################################################################
+# Pipe helpers (feed via stdin)
+########################################################################################
+
+errr() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: <command> 2>&1 | errr"
+        echo "  Diagnoses a piped error or stack trace: likely cause plus fix."
+        echo "  Example: python app.py 2>&1 | errr"
+        return 0
+    fi
+    if [[ -t 0 ]]; then
+        echo "Error: errr expects piped input, e.g. python app.py 2>&1 | errr" >&2
+        return 1
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You diagnose errors and stack traces. Structure: 1) the actual error in one line, 2) most likely cause, 3) concrete fix (command or code change). If several causes are plausible, list the top 2 in order of likelihood. Be brief and practical. Plain text." \
+        "Diagnose this error output."
+}
+
+summ() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: <command> | summ    or    cat file | summ"
+        echo "  Summarizes whatever is piped in."
+        echo "  Example: cat README.md | summ"
+        return 0
+    fi
+    if [[ -t 0 ]]; then
+        echo "Error: summ expects piped input, e.g. cat notes.md | summ" >&2
+        return 1
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You summarize content concisely for a technical reader: main purpose in one line, then the key points (5 lines max). No preamble, no markdown headers." \
+        "Summarize this."
+}
+
+jsonq() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: cat data.json | jsonq <question>"
+        echo "  Answers a question about piped JSON, and gives the jq expression for it."
+        echo "  Example: cat products.json | jsonq top 3 items by price"
+        return 0
+    fi
+    if [[ -t 0 ]]; then
+        echo "Error: jsonq expects piped JSON, e.g. cat data.json | jsonq 'your question'" >&2
+        return 1
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You answer questions about JSON data. Give the direct answer first, then on a separate line prefixed 'jq: ' provide the jq expression that extracts it, so the user can reuse it on larger files. Be brief. No markdown." \
+        "Question about this JSON: $*"
+}
+
+########################################################################################
+# File helpers
+########################################################################################
+
+explain() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: explain <question> [file]"
+        echo "  Answers a question. If a file is given, its contents are added as context."
+        echo "  Example: explain 'what does this do?' main.py"
+        return 0
+    fi
+    local question="$1"
+    local file="$2"
+    if [[ -n "$file" && -f "$file" ]]; then
+        _cc "$CC_SMART_MODEL" "$CC_EXPLAIN_SYSTEM_PROMPT" "### Input file: $file
+$(_cc_read "$file")
+
+### Question:
+$question"
+    else
+        _cc "$CC_SMART_MODEL" "$CC_EXPLAIN_SYSTEM_PROMPT" "$@"
+    fi
+}
+
+review() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: review <file>"
+        echo "  Quick code review of a single file: bugs, smells, and concrete suggestions."
+        echo "  Example: review src/utils.py"
+        return 0
+    fi
+    if [[ ! -f "$1" ]]; then
+        echo "Error: file not found: $1" >&2
+        return 1
+    fi
+    _cc "$CC_SMART_MODEL" \
+        "You are a senior engineer doing a focused code review. Report: 1) bugs or correctness issues (with line references), 2) risky patterns or smells, 3) concrete improvement suggestions. Skip style nitpicks unless they hide bugs. If the code is fine, say so briefly rather than inventing issues." \
+        "### File: $1
+$(_cc_read "$1")
+
+Review this file."
+}
+
+gitignore() {
+    if [[ "$1" == "--help" || $# -eq 0 ]]; then
+        echo "Usage: gitignore <stack>"
+        echo "  Prints a .gitignore for the given stack. Redirect to save it."
+        echo "  Example: gitignore python node macos > .gitignore"
+        return 0
+    fi
+    _cc "$CC_FAST_MODEL" \
+        "You generate .gitignore files. Output only the raw file contents with brief section comments (e.g. # Python). Cover the requested stacks plus common editor and OS artifacts. No markdown fences, no explanations." \
+        "Generate a .gitignore for: $*"
+}
+
+image_qa() {
+    if [[ "$1" == "--help" || $# -lt 2 ]]; then
+        echo "Usage: image_qa <question> <image_path>"
+        echo "  Asks a question about an image using a vision model."
+        echo "  Example: image_qa 'extract the text' scan.jpg"
+        return 0
+    fi
+    local question="$1"
+    local image_path="$2"
+    if [[ ! -f "$image_path" ]]; then
+        echo "Error: image file not found: $image_path" >&2
+        return 1
+    fi
+    # Not routed through _cc: needs the Read tool (to load the image) and extra turns.
+    claude -p "Look at the image at the path $image_path and answer: $question" \
+        --model "$CC_FAST_MODEL" \
+        --effort "$CC_EFFORT" \
+        --max-turns 3 \
+        --allowedTools "Read" \
+        --system-prompt "$CC_IMAGE_SYSTEM_PROMPT"
+}
+
+pycode() {
+    if [[ "$1" == "--help" ]]; then
+        echo "Usage: pycode [-x|--exec] <task description>"
+        echo "  Generates a minimal PEP 723 Python script from a task description."
+        echo "  -x, --exec  Also execute the generated script via uv run."
+        echo "  Example: pycode -x read data.csv and print column means"
+        return 0
+    fi
+    local do_exec=false
+    local -a task_words=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -x|--exec) do_exec=true ;;
+            *) task_words+=("$1") ;;
+        esac
+        shift
+    done
+    if (( ${#task_words[@]} == 0 )); then
+        echo "Usage: pycode [-x|--exec] <task description>" >&2
+        return 1
+    fi
+    local code
+    code=$(_cc "$CC_SMART_MODEL" "$CC_PYCODE_SYSTEM_PROMPT" "${task_words[@]}")
+    if [[ "$do_exec" == true ]]; then
+        echo "$code"
+        echo "................................"
+        echo "Executing code..."
+        echo "................................"
+        echo "$code" | uv run -
+    else
+        echo "$code"
+    fi
+}

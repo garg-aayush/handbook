@@ -56,28 +56,23 @@ killall cfprefsd
 ```
 Then reopen iTerm2.
 
-## Step 4 — Set up the `llm` CLI (Simon Willison's tool)
+## Step 4 — Claude Code helper functions
 
-`llm` is installed by Step 2 and powers my `cmd`, `explain`, `image_qa`, and
-`pycode` shell functions (defined in `~/.zshrc`). It needs an **OpenAI API key**.
+Step 2 installs `cc_helper_fns` to `~/.cc_helper_fns`, and `~/.zshrc` sources it.
+These are shell functions (`cmd`, `cmdx`, `explain`, `review`, `commitmsg`,
+`pycode`, and more) that wrap the Claude Code CLI (`claude -p`).
 
-Set the key once (it's stored in `llm`'s own config, not in any dotfile):
+They need the **Claude Code CLI** (`claude`) on your PATH (install it from
+https://claude.com/claude-code). No API key setup is needed in this folder.
 
-```bash
-llm keys set openai
-# paste your OpenAI API key when prompted
-```
-
-Get a key at https://platform.openai.com/api-keys · docs: https://llm.datasette.io
-
-Check it works:
+List everything and its usage:
 
 ```bash
-llm "say hello in one word"
+helpcc
 ```
 
-> The helper functions reference specific model names (e.g. `CMD_LLM`) near the
-> bottom of `~/.zshrc` — change them to models you actually have access to.
+> Override the models or effort by exporting `CC_FAST_MODEL`, `CC_SMART_MODEL`,
+> or `CC_EFFORT` before the file is sourced. Defaults: `haiku` / `sonnet` / `low`.
 
 ## Step 5 — Finish
 
@@ -91,7 +86,8 @@ Restart iTerm2 (or run `exec zsh`). If the prompt looks off, run `p10k configure
 |------|------------|
 | `setup.sh` | The installer from Step 2. Idempotent. |
 | `Brewfile` | Homebrew taps/formulae/casks, each line commented. |
-| `zshrc` | Becomes `~/.zshrc` (aliases, plugins, helper functions). |
+| `zshrc` | Becomes `~/.zshrc` (aliases, plugins; sources `~/.cc_helper_fns`). |
+| `cc_helper_fns` | Claude Code CLI helper functions → `~/.cc_helper_fns`. Run `helpcc` for the list. |
 | `p10k.zsh` | Powerlevel10k prompt config → `~/.p10k.zsh`. |
 | `com.googlecode.iterm2.plist` | iTerm2 preferences (theme, colors, font, profile). |
 | `yazi.toml` | Yazi config → `~/.config/yazi/yazi.toml`. PDF preview via poppler; bat opener for text/JSON/MD/YAML. |
