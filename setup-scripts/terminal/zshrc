@@ -29,6 +29,9 @@ fi
 # gh copilot aliases (only if gh + the copilot extension are installed)
 command -v gh >/dev/null 2>&1 && eval "$(gh copilot alias -- zsh 2>/dev/null)"
 
+# direnv — per-directory env (switches gh CLI identity per repo; see dev-tips/git-multiple-accounts.md)
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+
 # PATHs
 export PATH="$PATH:$HOME/.local/bin"                       # pipx
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"             # llvm
