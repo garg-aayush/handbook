@@ -17,7 +17,7 @@ brew "jq"                                       # command-line JSON processor
 brew "k6"                                       # load/performance testing tool
 brew "libpq", link: true                       # PostgreSQL client libraries (psql, libpq); force-linked
 brew "llama.cpp"                               # run local LLMs (GGUF models) on CPU/GPU
-brew "llm"                                     # Simon Willison's LLM CLI (used by cmd/explain/pycode functions)
+brew "llm"                                     # Simon Willison's LLM CLI (ad-hoc use; the cmd/explain helpers now use the claude CLI)
 brew "llvm"                                    # LLVM/Clang toolchain (added to PATH in .zshrc)
 brew "macmon"                                  # Apple Silicon power/temp monitor — sudoless (no root needed)
 brew "pandoc"                                  # universal document converter (md/docx/pdf/etc.)

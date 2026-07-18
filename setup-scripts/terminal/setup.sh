@@ -68,6 +68,7 @@ backup() { [ -f "$1" ] && cp "$1" "$1.backup-$(date +%Y%m%d%H%M%S)" && echo "  b
 
 backup "$HOME/.zshrc";  cp "$SCRIPT_DIR/zshrc" "$HOME/.zshrc"
 backup "$HOME/.p10k.zsh"; cp "$SCRIPT_DIR/p10k.zsh" "$HOME/.p10k.zsh"
+backup "$HOME/.cc_helper_fns"; cp "$SCRIPT_DIR/cc_helper_fns" "$HOME/.cc_helper_fns"  # Claude Code helper functions
 
 # 9. Default shell ------------------------------------------------------------
 if [ "$(basename "${SHELL:-}")" != "zsh" ]; then
@@ -84,8 +85,8 @@ cat <<'DONE'
       iTerm2 -> Settings -> General -> Settings ->
       "Load preferences from a custom folder or URL" -> select THIS folder
       (it contains com.googlecode.iterm2.plist). See README.md, step 2.
-   2. Set up the llm CLI (needed by the cmd/explain/pycode functions):
-        llm keys set openai      # paste your OpenAI API key
+   2. The cmd/explain/pycode helper functions need the Claude Code CLI on PATH.
+      Install it (see claude.com/claude-code), then run `helpcc` to list them.
    3. Restart iTerm2, or run:  exec zsh
    4. If the prompt looks off, run:  p10k configure
 ==============================================================
