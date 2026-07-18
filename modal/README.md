@@ -1,5 +1,5 @@
-# modal-tutorials
-A collection of Modal tutorials
+# Modal
+Scripts using [Modal](https://modal.com/) for large-scale data processing.
 
 |**Tutorial** | **Description** | **Link** |
 | :-- | :-- | :--: |

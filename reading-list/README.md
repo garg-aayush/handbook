@@ -11,9 +11,15 @@ reading-list/
 ├── blogs/         # Engineering blogs, articles, posts
 ├── books/         # Books, book chapters, book recommendations
 ├── tools/         # Libraries, frameworks, products, services
+└── *.md           # Curated topic guides (see below)
 ```
 
-## File format
+Two kinds of entries live here:
+
+1. **Atomic resource files** inside the category folders: one file per resource, with YAML frontmatter (format below).
+2. **Curated topic guides** at the root (e.g. `post-training-rl.md`): a single markdown file collecting many links around one topic, ordered as a learning path. Use these when the value is in the grouping and ordering rather than in per-resource metadata.
+
+## File format (atomic resource files)
 
 Each entry is a markdown file with YAML frontmatter:
 
