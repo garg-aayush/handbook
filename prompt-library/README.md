@@ -13,6 +13,7 @@ Reusable prompts and prompt templates for daily use with LLMs.
 | [transcript-cleaning.md](transcript-cleaning.md) | Clean raw transcripts into polished monologues | Single variant |
 | [paper-reading.md](paper-reading.md) | Understand papers/blogs step by step with quizzes | Single variant |
 | [prompt-fragments.md](prompt-fragments.md) | Reusable prefixes, suffixes, and anecdotes | Clarify Intent |
+| [roles.md](roles.md) | Reusable expert role / persona prefixes | Bash, ML Platform, Architecture, Metadata, Dashboard, Extraction |
 
 ## Format Guide
 
