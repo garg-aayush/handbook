@@ -18,6 +18,7 @@ Personal reference repo — notes, scripts, skills, and templates I reach for re
 | `reading-list/` | Structured reading list (papers, tech-reports, blogs, books, tools, topic guides) |
 | `rulesets/` | GitHub branch-protection rules |
 | `setup-scripts/` | New-Mac terminal setup (iTerm2, zsh, Brewfile, dotfiles) |
+| `time-series/` | Time-series analysis code (Kalman filters and smoothing examples) |
 
 Standalone files: `starred-repos.md` (247 starred GitHub repos organized by category).
 
